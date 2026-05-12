@@ -22,7 +22,49 @@
       ],
       "sku": "jrn:jpm:tpc:::sku:7516?version=1",
       "deploymentscope": "jrn:jpm:gsub:::subscription:v1-87723-63866-dev-0",
-      "$comment": "{RESOURE-TYPE-SPECIFIC-DESIRED-STATE-PROPERTIES}"
+      "unique-id": "gkafka-cluster-005aa3ea4f3444d9bdebbdae4ccea985",
+      "node-type": "system",
+      "resourceProviderURN": "gafka",
+      "resourceTypeURN": "cluster",
+      "availabilityType": "MULTI_ZONE",
+      "clusterEngineType": "KRAFT",
+      "clusterVersion": "3.7.0",
+      "connectionProfile": {
+        "schemaRegistryUrl": "https://schema-registry.gkafka.jrn.jpmchase.net",
+        "topicSuffix": ".v1"
+      },
+      "nodeCount": 3,
+      "nodeStorageGB": 500,
+      "nodeStorageTier": "SSD",
+      "nodeTier": "STANDARD_8X",
+      "kafkaBrokerConnectionProtocols": [
+        {
+          "protocol": "SASL_SSL",
+          "protocolImplementation": "OAUTHBEARER",
+          "serviceName": "gkafka-005aa3ea4f34",
+          "bootstrapServersUrl": "https://gkafka-005aa3ea4f34.na-ne.kafka.jpmc.internal:9092"
+        }
+      ],
+      "calm-nodes": [
+        {
+          "unique-id": "icpw-cluster",
+          "node-type": "system",
+          "name": "ICPw Cluster",
+          "description": "ICPw cluster that hosts the Gaia Kafka Cluster infrastructure"
+        }
+      ],
+      "calm-relationships": [
+        {
+          "unique-id": "rel-cluster-hosted-on-icpw",
+          "description": "GaiaKafkaCluster is hosted on (deployed in) the ICPw Cluster infrastructure node",
+          "relationship-type": {
+            "deployed-in": {
+              "container": "icpw-cluster-01",
+              "nodes": ["gkafka-cluster-005aa3ea4f3444d9bdebbdae4ccea985"]
+            }
+          }
+        }
+      ]
     }
   }
 }
