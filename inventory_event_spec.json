@@ -1,0 +1,28 @@
+{
+  "specversion": "1.0",
+  "gtfespecversion": "2.1",
+  "dataschema": "https://gkafka.jrn.jpmchase.net/schemas/v1/kafka-cluster-schema.json",
+  "datacontenttype": "application/json",
+  "id": "1ca0dfa7-6fce-491e-a4a5-d16e035d136f",
+  "subject": "jrn:jpm:gkafka:::cluster:005aa3ea4f3444d9bdebbdae4ccea985?version=1",
+  "time": "2024-10-02T16:17:21Z",
+  "type": "com.jpmc.gaia.gkafka.cluster.v1.provisioned",
+  "source": "jrn:jpm:gkafka:",
+  "subscription": "jrn:jpm:gsub:::subscription:v1-87723-63866-dev-0",
+  "subscriptionenv": "dev",
+  "data": {
+    "metadata": {
+      "creationtimestamp": "2024-10-02T16:16:21Z",
+      "$comment": "{RESOURE-TYPE-SPECIFIC-DESIRED-METADATA-PROPERTIES}"
+    },
+    "spec": {
+      "locations": [
+        "jrn:jpm:gloc:::room:NA-NE-C01-Module1?version=1",
+        "jrn:jpm:gloc:::room:NA-NE-C01-Module2?version=1"
+      ],
+      "sku": "jrn:jpm:tpc:::sku:7516?version=1",
+      "deploymentscope": "jrn:jpm:gsub:::subscription:v1-87723-63866-dev-0",
+      "$comment": "{RESOURE-TYPE-SPECIFIC-DESIRED-STATE-PROPERTIES}"
+    }
+  }
+}
