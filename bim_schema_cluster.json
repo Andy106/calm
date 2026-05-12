@@ -1,0 +1,151 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "GaiaKafkaCluster",
+  "description": "A Gaia Kafka Cluster is an aggregate of Zookeeper, Kafka, and Replicator. Replicator is an optional component used for cross-region resiliency.",
+  "$ref": "#/$defs/GaiaKafkaCluster",
+  "$defs": {
+
+    "KafkaAvailabilityType": {
+      "type": "string",
+      "description": "Availability zone strategy for the Kafka cluster"
+    },
+
+    "KafkaClusterEngineType": {
+      "type": "string",
+      "description": "The underlying engine type for the Kafka cluster"
+    },
+
+    "StorageTier": {
+      "type": "string",
+      "description": "Storage tier classification for cluster nodes"
+    },
+
+    "KafkaProtocol": {
+      "type": "string",
+      "enum": ["SASL_SSL"],
+      "description": "Supported Kafka broker security protocol"
+    },
+
+    "KafkaProtocolImplementation": {
+      "type": "string",
+      "enum": ["OAUTHBEARER"],
+      "description": "SASL mechanism used for authentication"
+    },
+
+    "KafkaConnectionProfile": {
+      "type": "object",
+      "description": "Holds the connection endpoints and buffer configuration for a Kafka cluster",
+      "properties": {
+        "kafkaEndpoints": {
+          "type": "string",
+          "format": "uri",
+          "description": "Primary Kafka bootstrap endpoint URI [1]"
+        },
+        "topicBuffer": {
+          "type": "string",
+          "description": "Topic buffer configuration value [1]"
+        }
+      },
+      "required": ["kafkaEndpoints", "topicBuffer"],
+      "additionalProperties": false
+    },
+
+    "KafkaConnectionProtocol": {
+      "type": "object",
+      "description": "Defines a single Kafka broker connection protocol entry",
+      "properties": {
+        "protocol": {
+          "$ref": "#/$defs/KafkaProtocol",
+          "description": "Kafka protocol [1], default SASL_SSL"
+        },
+        "protocolImplementation": {
+          "$ref": "#/$defs/KafkaProtocolImplementation",
+          "description": "Protocol implementation [1], default OAUTHBEARER"
+        },
+        "bootstrapServers": {
+          "type": "string",
+          "description": "Comma-separated list of bootstrap server host:port pairs [1]"
+        },
+        "bootstrapServersEIR": {
+          "type": "string",
+          "format": "uri",
+          "description": "Bootstrap servers URI for EIR connectivity [1]"
+        }
+      },
+      "required": ["protocol", "protocolImplementation", "bootstrapServers", "bootstrapServersEIR"],
+      "additionalProperties": false
+    },
+
+    "GaiaKafkaCluster": {
+      "type": "object",
+      "description": "A Gaia Kafka Cluster is an aggregate of Zookeeper, Kafka, and Replicator. Replicator is an optional component used for cross-region resiliency.",
+      "properties": {
+        "resourceProviderURN": {
+          "type": "string",
+          "const": "gafka",
+          "description": "Fixed provider URN for Gaia Kafka"
+        },
+        "resourceTypeURN": {
+          "type": "string",
+          "const": "cluster",
+          "description": "Fixed resource type URN"
+        },
+        "availabilityType": {
+          "$ref": "#/$defs/KafkaAvailabilityType",
+          "description": "Availability strategy [1]"
+        },
+        "clusterEngineType": {
+          "$ref": "#/$defs/KafkaClusterEngineType",
+          "description": "Cluster engine type [0..1]"
+        },
+        "connectionProfile": {
+          "$ref": "#/$defs/KafkaConnectionProfile",
+          "description": "Connection profile for the cluster [1]"
+        },
+        "nodeCount": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Number of broker nodes in the cluster [1]"
+        },
+        "nodeSize": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Compute size class for each node [1]"
+        },
+        "nodeStorageTier": {
+          "$ref": "#/$defs/StorageTier",
+          "description": "Storage tier applied to each node [1]"
+        },
+        "nodes": {
+          "type": "array",
+          "items": { "type": "object" },
+          "description": "Individual node references [0..*]"
+        },
+        "replicaCluster": {
+          "$ref": "#/$defs/GaiaKafkaCluster",
+          "description": "Optional replica cluster for cross-region resiliency [0..1]"
+        },
+        "kafkaBrokerConnectionProtocols": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/KafkaConnectionProtocol"
+          },
+          "minItems": 1,
+          "description": "One or more broker connection protocol definitions [1..*]"
+        }
+      },
+      "required": [
+        "resourceProviderURN",
+        "resourceTypeURN",
+        "availabilityType",
+        "connectionProfile",
+        "nodeCount",
+        "nodeSize",
+        "nodeStorageTier",
+        "kafkaBrokerConnectionProtocols"
+      ],
+      "additionalProperties": false
+    }
+
+  }
+}
