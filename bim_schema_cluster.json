@@ -34,41 +34,50 @@
           "type": "string",
           "description": "The underlying engine type for the Kafka cluster"
         },
+        "clusterVersion": {
+          "type": "string",
+          "description": "Kafka Cluster version"
+        },
         "connectionProfile": {
           "type": "object",
-          "description": "Connection endpoints and buffer configuration for the cluster",
+          "description": "Connection Profile for the cluster",
           "properties": {
-            "kafkaEndpoints": {
+            "schemaRegistryUrl": {
               "type": "string",
               "format": "uri"
             },
-            "topicBuffer": {
+            "topicSuffix": {
               "type": "string"
             }
           },
-          "required": ["kafkaEndpoints", "topicBuffer"],
+          "required": ["schemaRegistryUrl"],
           "additionalProperties": false
+        },
+       "locations": {
+        "type": "array",
+        "items": {
+          "type": "string"
+           }
         },
         "nodeCount": {
           "type": "integer",
           "minimum": 1,
           "description": "Number of broker nodes in the cluster"
         },
-        "nodeSize": {
+        "nodeStorageGB": {
           "type": "integer",
           "minimum": 1,
-          "description": "Compute size class for each node"
+          "description": "Storage in GBs for each node"
         },
         "nodeStorageTier": {
           "type": "string",
           "description": "Storage tier applied to each node"
         },
-        "nodes": {
-          "type": "array",
-          "items": { "type": "object" },
-          "description": "Individual broker node references"
+        "nodeTier": {
+          "type": "string",
+          "description": "Compute Tier for each node"
         },
-        "replicaCluster": {
+        "replicatedCluster": {
           "$ref": "#/$defs/GaiaKafkaCluster",
           "description": "Optional replica cluster for cross-region resiliency"
         },
@@ -87,15 +96,15 @@
                 "type": "string",
                 "enum": ["OAUTHBEARER"]
               },
-              "bootstrapServers": {
+              "serviceName": {
                 "type": "string"
               },
-              "bootstrapServersEIR": {
+              "bootstrapServersUrl": {
                 "type": "string",
                 "format": "uri"
               }
             },
-            "required": ["protocol", "protocolImplementation", "bootstrapServers", "bootstrapServersEIR"],
+            "required": ["protocol", "protocolImplementation", "serviceName", "bootstrapServersUrl"],
             "additionalProperties": false
           }
         },
@@ -110,7 +119,7 @@
               "unique-id": "icpw-cluster",
               "node-type": "system",
               "name": "ICPw Cluster",
-              "description": "IBM Cloud Private for Windows cluster that hosts the Gaia Kafka Cluster infrastructure"
+              "description": "ICPw cluster that hosts the Gaia Kafka Cluster infrastructure"
             },
             {
               "unique-id": "gaia-kafka-service-control-plane",
@@ -128,19 +137,19 @@
               "unique-id": "sophia-pam",
               "node-type": "service",
               "name": "Sophia PAM",
-              "description": "Privileged Access Management service providing credential vaulting and access control"
+              "description": "Privileged Access Management service"
             },
             {
               "unique-id": "sophia-cida",
               "node-type": "service",
               "name": "Sophia CIDA",
-              "description": "Continuous Identity and Data Access service for entitlement enforcement"
+              "description": "Converged Identity service"
             },
             {
               "unique-id": "aim-gfs",
               "node-type": "service",
               "name": "AIM-GFS",
-              "description": "Automated Identity Management - Global File System integration"
+              "description": "Global File System integration"
             },
             {
               "unique-id": "loga-splunk",
@@ -198,7 +207,7 @@
             },
             {
               "unique-id": "rel-cluster-connects-sophia-pam",
-              "description": "Cluster connects to Sophia PAM for privileged access management and credential retrieval",
+              "description": "Cluster connects to Sophia PAM for privileged access management",
               "relationship-type": {
                 "connects": {
                   "source": { "node": "gaia-kafka-cluster" },
@@ -209,7 +218,7 @@
             },
             {
               "unique-id": "rel-cluster-connects-sophia-cida",
-              "description": "Cluster connects to Sophia CIDA for continuous identity and data access entitlement checks",
+              "description": "Cluster connects to Sophia CIDA",
               "relationship-type": {
                 "connects": {
                   "source": { "node": "gaia-kafka-cluster" },
@@ -220,7 +229,7 @@
             },
             {
               "unique-id": "rel-cluster-connects-aim-gfs",
-              "description": "Cluster connects to AIM-GFS for automated identity management and global file system integration",
+              "description": "Cluster connects to AIM-GFS for global file system integration",
               "relationship-type": {
                 "connects": {
                   "source": { "node": "gaia-kafka-cluster" },
@@ -258,10 +267,13 @@
         "resourceProviderURN",
         "resourceTypeURN",
         "availabilityType",
+        "clusterEngineType",
         "connectionProfile",
+        "locations",
         "nodeCount",
-        "nodeSize",
+        "nodeStorageGB",
         "nodeStorageTier",
+        "nodeTier",
         "kafkaBrokerConnectionProtocols"
       ],
       "additionalProperties": false
