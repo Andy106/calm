@@ -5,133 +5,253 @@
   "$ref": "#/$defs/GaiaKafkaCluster",
   "$defs": {
 
-    "KafkaAvailabilityType": {
-      "type": "string",
-      "description": "Availability zone strategy for the Kafka cluster"
-    },
-
-    "KafkaClusterEngineType": {
-      "type": "string",
-      "description": "The underlying engine type for the Kafka cluster"
-    },
-
-    "StorageTier": {
-      "type": "string",
-      "description": "Storage tier classification for cluster nodes"
-    },
-
-    "KafkaProtocol": {
-      "type": "string",
-      "enum": ["SASL_SSL"],
-      "description": "Supported Kafka broker security protocol"
-    },
-
-    "KafkaProtocolImplementation": {
-      "type": "string",
-      "enum": ["OAUTHBEARER"],
-      "description": "SASL mechanism used for authentication"
-    },
-
-    "KafkaConnectionProfile": {
-      "type": "object",
-      "description": "Holds the connection endpoints and buffer configuration for a Kafka cluster",
-      "properties": {
-        "kafkaEndpoints": {
-          "type": "string",
-          "format": "uri",
-          "description": "Primary Kafka bootstrap endpoint URI [1]"
-        },
-        "topicBuffer": {
-          "type": "string",
-          "description": "Topic buffer configuration value [1]"
-        }
-      },
-      "required": ["kafkaEndpoints", "topicBuffer"],
-      "additionalProperties": false
-    },
-
-    "KafkaConnectionProtocol": {
-      "type": "object",
-      "description": "Defines a single Kafka broker connection protocol entry",
-      "properties": {
-        "protocol": {
-          "$ref": "#/$defs/KafkaProtocol",
-          "description": "Kafka protocol [1], default SASL_SSL"
-        },
-        "protocolImplementation": {
-          "$ref": "#/$defs/KafkaProtocolImplementation",
-          "description": "Protocol implementation [1], default OAUTHBEARER"
-        },
-        "bootstrapServers": {
-          "type": "string",
-          "description": "Comma-separated list of bootstrap server host:port pairs [1]"
-        },
-        "bootstrapServersEIR": {
-          "type": "string",
-          "format": "uri",
-          "description": "Bootstrap servers URI for EIR connectivity [1]"
-        }
-      },
-      "required": ["protocol", "protocolImplementation", "bootstrapServers", "bootstrapServersEIR"],
-      "additionalProperties": false
-    },
-
     "GaiaKafkaCluster": {
       "type": "object",
       "description": "A Gaia Kafka Cluster is an aggregate of Zookeeper, Kafka, and Replicator. Replicator is an optional component used for cross-region resiliency.",
       "properties": {
+        "unique-id": {
+          "type": "string",
+          "description": "CALM stable identifier for this cluster node"
+        },
+        "node-type": {
+          "type": "string",
+          "default": "system",
+          "description": "CALM node type; a Kafka cluster is classified as 'system'"
+        },
         "resourceProviderURN": {
           "type": "string",
-          "const": "gafka",
-          "description": "Fixed provider URN for Gaia Kafka"
+          "const": "gafka"
         },
         "resourceTypeURN": {
           "type": "string",
-          "const": "cluster",
-          "description": "Fixed resource type URN"
+          "const": "cluster"
         },
         "availabilityType": {
-          "$ref": "#/$defs/KafkaAvailabilityType",
-          "description": "Availability strategy [1]"
+          "type": "string",
+          "description": "Availability zone strategy for the Kafka cluster"
         },
         "clusterEngineType": {
-          "$ref": "#/$defs/KafkaClusterEngineType",
-          "description": "Cluster engine type [0..1]"
+          "type": "string",
+          "description": "The underlying engine type for the Kafka cluster"
         },
         "connectionProfile": {
-          "$ref": "#/$defs/KafkaConnectionProfile",
-          "description": "Connection profile for the cluster [1]"
+          "type": "object",
+          "description": "Connection endpoints and buffer configuration for the cluster",
+          "properties": {
+            "kafkaEndpoints": {
+              "type": "string",
+              "format": "uri"
+            },
+            "topicBuffer": {
+              "type": "string"
+            }
+          },
+          "required": ["kafkaEndpoints", "topicBuffer"],
+          "additionalProperties": false
         },
         "nodeCount": {
           "type": "integer",
           "minimum": 1,
-          "description": "Number of broker nodes in the cluster [1]"
+          "description": "Number of broker nodes in the cluster"
         },
         "nodeSize": {
           "type": "integer",
           "minimum": 1,
-          "description": "Compute size class for each node [1]"
+          "description": "Compute size class for each node"
         },
         "nodeStorageTier": {
-          "$ref": "#/$defs/StorageTier",
-          "description": "Storage tier applied to each node [1]"
+          "type": "string",
+          "description": "Storage tier applied to each node"
         },
         "nodes": {
           "type": "array",
           "items": { "type": "object" },
-          "description": "Individual node references [0..*]"
+          "description": "Individual broker node references"
         },
         "replicaCluster": {
           "$ref": "#/$defs/GaiaKafkaCluster",
-          "description": "Optional replica cluster for cross-region resiliency [0..1]"
+          "description": "Optional replica cluster for cross-region resiliency"
         },
         "kafkaBrokerConnectionProtocols": {
           "type": "array",
-          "items": {
-            "$ref": "#/$defs/KafkaConnectionProtocol"
-          },
           "minItems": 1,
-          "description": "One or more broker connection protocol definitions [1..*]"
+          "description": "One or more broker connection protocol definitions",
+          "items": {
+            "type": "object",
+            "properties": {
+              "protocol": {
+                "type": "string",
+                "enum": ["SASL_SSL"]
+              },
+              "protocolImplementation": {
+                "type": "string",
+                "enum": ["OAUTHBEARER"]
+              },
+              "bootstrapServers": {
+                "type": "string"
+              },
+              "bootstrapServersEIR": {
+                "type": "string",
+                "format": "uri"
+              }
+            },
+            "required": ["protocol", "protocolImplementation", "bootstrapServers", "bootstrapServersEIR"],
+            "additionalProperties": false
+          }
+        },
+        "calm-nodes": {
+          "type": "array",
+          "description": "CALM nodes for each external system this cluster depends on (see https://calm.finos.org/draft/2025-03/meta/core.json)",
+          "items": {
+            "$ref": "https://calm.finos.org/draft/2025-03/meta/core.json#/defs/node"
+          },
+          "default": [
+            {
+              "unique-id": "icpw-cluster",
+              "node-type": "system",
+              "name": "ICPw Cluster",
+              "description": "IBM Cloud Private for Windows cluster that hosts the Gaia Kafka Cluster infrastructure"
+            },
+            {
+              "unique-id": "gaia-kafka-service-control-plane",
+              "node-type": "system",
+              "name": "Gaia Kafka Service Control Plane",
+              "description": "Control plane responsible for provisioning and lifecycle management of Gaia Kafka Clusters"
+            },
+            {
+              "unique-id": "idanywhere",
+              "node-type": "service",
+              "name": "IDAnywhere",
+              "description": "Identity and authentication service used by the Kafka cluster for principal verification"
+            },
+            {
+              "unique-id": "sophia-pam",
+              "node-type": "service",
+              "name": "Sophia PAM",
+              "description": "Privileged Access Management service providing credential vaulting and access control"
+            },
+            {
+              "unique-id": "sophia-cida",
+              "node-type": "service",
+              "name": "Sophia CIDA",
+              "description": "Continuous Identity and Data Access service for entitlement enforcement"
+            },
+            {
+              "unique-id": "aim-gfs",
+              "node-type": "service",
+              "name": "AIM-GFS",
+              "description": "Automated Identity Management - Global File System integration"
+            },
+            {
+              "unique-id": "loga-splunk",
+              "node-type": "service",
+              "name": "LogA (Splunk)",
+              "description": "Centralised log aggregation and SIEM platform receiving audit and operational logs from the cluster"
+            },
+            {
+              "unique-id": "grafana",
+              "node-type": "service",
+              "name": "Grafana",
+              "description": "Observability and metrics dashboarding platform monitoring cluster health and performance"
+            }
+          ]
+        },
+        "calm-relationships": {
+          "type": "array",
+          "description": "CALM relationships expressing all data-plane dependencies of this cluster (see https://calm.finos.org/draft/2025-03/meta/core.json)",
+          "items": {
+            "$ref": "https://calm.finos.org/draft/2025-03/meta/core.json#/defs/relationship"
+          },
+          "default": [
+            {
+              "unique-id": "rel-cluster-hosted-on-icpw",
+              "description": "GaiaKafkaCluster is hosted on (deployed in) the ICPw Cluster infrastructure node",
+              "relationship-type": {
+                "deployed-in": {
+                  "container": "icpw-cluster",
+                  "nodes": ["gaia-kafka-cluster"]
+                }
+              }
+            },
+            {
+              "unique-id": "rel-provisioned-by-control-plane",
+              "description": "Gaia Kafka Service Control Plane provisions and manages the lifecycle of this cluster",
+              "relationship-type": {
+                "connects": {
+                  "source": { "node": "gaia-kafka-service-control-plane" },
+                  "destination": { "node": "gaia-kafka-cluster" }
+                }
+              },
+              "protocol": "HTTPS"
+            },
+            {
+              "unique-id": "rel-cluster-connects-idanywhere",
+              "description": "Cluster connects to IDAnywhere for identity and principal authentication",
+              "relationship-type": {
+                "connects": {
+                  "source": { "node": "gaia-kafka-cluster" },
+                  "destination": { "node": "idanywhere" }
+                }
+              },
+              "protocol": "HTTPS",
+              "authentication": "OAuth2"
+            },
+            {
+              "unique-id": "rel-cluster-connects-sophia-pam",
+              "description": "Cluster connects to Sophia PAM for privileged access management and credential retrieval",
+              "relationship-type": {
+                "connects": {
+                  "source": { "node": "gaia-kafka-cluster" },
+                  "destination": { "node": "sophia-pam" }
+                }
+              },
+              "protocol": "HTTPS"
+            },
+            {
+              "unique-id": "rel-cluster-connects-sophia-cida",
+              "description": "Cluster connects to Sophia CIDA for continuous identity and data access entitlement checks",
+              "relationship-type": {
+                "connects": {
+                  "source": { "node": "gaia-kafka-cluster" },
+                  "destination": { "node": "sophia-cida" }
+                }
+              },
+              "protocol": "HTTPS"
+            },
+            {
+              "unique-id": "rel-cluster-connects-aim-gfs",
+              "description": "Cluster connects to AIM-GFS for automated identity management and global file system integration",
+              "relationship-type": {
+                "connects": {
+                  "source": { "node": "gaia-kafka-cluster" },
+                  "destination": { "node": "aim-gfs" }
+                }
+              },
+              "protocol": "HTTPS"
+            },
+            {
+              "unique-id": "rel-cluster-connects-loga-splunk",
+              "description": "Cluster ships audit and operational logs to LogA (Splunk) for centralised log aggregation",
+              "relationship-type": {
+                "connects": {
+                  "source": { "node": "gaia-kafka-cluster" },
+                  "destination": { "node": "loga-splunk" }
+                }
+              },
+              "protocol": "TCP"
+            },
+            {
+              "unique-id": "rel-cluster-connects-grafana",
+              "description": "Cluster exposes metrics to Grafana for observability and performance dashboarding",
+              "relationship-type": {
+                "connects": {
+                  "source": { "node": "gaia-kafka-cluster" },
+                  "destination": { "node": "grafana" }
+                }
+              },
+              "protocol": "HTTPS"
+            }
+          ]
         }
       },
       "required": [
